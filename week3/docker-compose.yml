@@ -1,0 +1,42 @@
+services:
+
+  # ── PostgreSQL + pgvector ──────────────────────────────────────
+  pgvector:
+    image: pgvector/pgvector:pg16
+    container_name: pgvector-week3
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: semantic_search_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgvector_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ── Ollama (GPU) ───────────────────────────────────────────────
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama-week3
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    environment:
+      - OLLAMA_KEEP_ALIVE=24h    # 保持模型常駐記憶體，避免每次重載
+
+volumes:
+  pgvector_data:
+  ollama_data:
