@@ -1,0 +1,1 @@
+docker stop pgvector-week3 && docker rm pgvector-week3
