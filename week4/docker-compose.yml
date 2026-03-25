@@ -1,0 +1,22 @@
+services:
+
+  # ── PostgreSQL + pgvector ──────────────────────────────────────
+  pgvector:
+    image: pgvector/pgvector:pg16
+    container_name: pgvector-week4
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: qa_db
+    ports:
+      - "5435:5432"
+    volumes:
+      - pgvector_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgvector_data:
